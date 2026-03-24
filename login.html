@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Register - LifeFlow{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-badhan text-white text-center py-3">
+                    <h3 class="mb-0"><i class="fas fa-user-plus"></i> Create Your Account</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="text-center mb-4">
+                            <label class="form-label fw-bold">Profile Picture (Optional)</label>
+                            <input type="file" name="profile_pic" class="form-control" accept="image/*">
+                        </div>
+
+                        <h5 class="text-badhan mb-3"><i class="fas fa-user"></i> Personal Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mobile Number *</label>
+                                <input type="tel" name="phone" class="form-control" placeholder="017..." required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email Address *</label>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Password *</label>
+                                <input type="password" name="password" class="form-control" required minlength="6">
+                            </div>
+                            
+                            <!-- Age & DOB -->
+                            <div class="col-md-6">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" name="date_of_birth" id="date_of_birth" class="form-control" onchange="calculateAge()">
+                                <small class="text-muted">Age auto-calculated</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Age</label>
+                                <input type="number" name="age" id="age" class="form-control" min="1" max="100">
+                                <small class="text-muted">Editable</small>
+                            </div>
+                            
+                            <!-- Birth Certificate (Optional) -->
+                            <div class="col-12">
+                                <label class="form-label">Birth Certificate Number (Optional)</label>
+                                <input type="text" name="birth_certificate" class="form-control" placeholder="Optional for verification">
+                                <small class="text-muted">Helps with donor verification but not required</small>
+                            </div>
+                            
+                            <hr class="my-4">
+                            <h5 class="text-badhan mb-3"><i class="fas fa-tint"></i> Blood & Location</h5>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">Blood Group *</label>
+                                <select name="blood_group" class="form-select" required>
+                                    <option value="">Select</option>
+                                    <option value="A+">A+</option><option value="A-">A-</option>
+                                    <option value="B+">B+</option><option value="B-">B-</option>
+                                    <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                                    <option value="O+">O+</option><option value="O-">O-</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">I want to:</label>
+                                <select name="role" class="form-select">
+                                    <option value="Both">Donate & Request</option>
+                                    <option value="Donor">Donate Only</option>
+                                    <option value="Recipient">Request Only</option>
+                                    <option value="Volunteer">Volunteer</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-success">
+                                    <i class="fas fa-info-circle"></i> Must be 18+ to donate
+                                </label>
+                                <input type="text" class="form-control" value="18+ years to donate" readonly disabled>
+                            </div>
+                            
+                            <!-- Bangladesh Locations -->
+                            <div class="col-md-4">
+                                <label class="form-label">Division *</label>
+                                <select id="division" name="division" class="form-select" required onchange="updateDistricts()"></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">District *</label>
+                                <select id="district" name="district" class="form-select" required onchange="updateUpazilas()"></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Upazila *</label>
+                                <select id="upazila" name="upazila" class="form-select" required></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Union/Area</label>
+                                <input type="text" name="union" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Holding/House No.</label>
+                                <input type="text" name="holding" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-4">
+                            <i class="fas fa-info-circle"></i> <strong>Note:</strong> Anyone can register. To donate blood, you must be 18+ years old and get verified by admin.
+                        </div>
+
+                        <div class="mt-4 d-grid gap-2">
+                            <button type="submit" class="btn btn-badhan btn-lg">
+                                <i class="fas fa-user-plus"></i> Register Now
+                            </button>
+                            <a href="{{ url_for('login') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-sign-in-alt"></i> Already have an account? Login
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Bangladesh location data (same as before)
+const bangladeshData = { /* ... paste bangladeshData ... */ };
+
+const divSel = document.getElementById('division');
+const distSel = document.getElementById('district');
+const upaSel = document.getElementById('upazila');
+
+Object.keys(bangladeshData).forEach(div => {
+    let opt = document.createElement('option');
+    opt.value = div; opt.innerHTML = div;
+    divSel.appendChild(opt);
+});
+
+function updateDistricts() {
+    distSel.innerHTML = '<option value="">Select District</option>';
+    upaSel.innerHTML = '<option value="">Select Upazila</option>';
+    const selectedDiv = divSel.value;
+    if (selectedDiv && bangladeshData[selectedDiv]) {
+        Object.keys(bangladeshData[selectedDiv]).forEach(dist => {
+            let opt = document.createElement('option');
+            opt.value = dist; opt.innerHTML = dist;
+            distSel.appendChild(opt);
+        });
+    }
+}
+
+function updateUpazilas() {
+    upaSel.innerHTML = '<option value="">Select Upazila</option>';
+    const selectedDiv = divSel.value;
+    const selectedDist = distSel.value;
+    if (selectedDiv && selectedDist && bangladeshData[selectedDiv][selectedDist]) {
+        bangladeshData[selectedDiv][selectedDist].forEach(upa => {
+            let opt = document.createElement('option');
+            opt.value = upa; opt.innerHTML = upa;
+            upaSel.appendChild(opt);
+        });
+    }
+}
+
+// Auto-calculate age
+function calculateAge() {
+    const dobInput = document.getElementById('date_of_birth');
+    const ageInput = document.getElementById('age');
+    
+    if (dobInput.value) {
+        const dob = new Date(dobInput.value);
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const monthDiff = today.getMonth() - dob.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+            age--;
+        }
+        
+        ageInput.value = age;
+        ageInput.readOnly = false; // Make editable after calculation
+    }
+}
+</script>
+{% endblock %}

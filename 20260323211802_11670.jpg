@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}{{ request.blood_group }} Request - LifeFlow{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('blood_requests') }}">Blood Requests</a></li>
+            <li class="breadcrumb-item active">Request #{{ request.id }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                {% if request.is_urgent %}
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle"></i> URGENT: {{ request.blood_group }} Needed</h4>
+                    <span class="badge-urgent">URGENT</span>
+                </div>
+                {% else %}
+                <div class="card-header bg-badhan text-white">
+                    <h4 class="mb-0"><i class="fas fa-tint"></i> {{ request.blood_group }} Blood Request</h4>
+                </div>
+                {% endif %}
+                
+                <div class="card-body p-4">
+                    <!-- Patient Info -->
+                    <h5 class="text-badhan mb-3"><i class="fas fa-user-injured"></i> Patient Information</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><strong>Patient:</strong> {{ request.patient_name }}</p>
+                            <p><strong>Relation:</strong> {{ request.patient_relation }}</p>
+                            <p><strong>Blood Group:</strong> <span class="badge-blood">{{ request.blood_group }}</span></p>
+                            <p><strong>Quantity:</strong> {{ request.quantity }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            {% if request.is_urgent %}
+                            <div class="alert alert-danger">
+                                <strong>Urgency Reason:</strong> {{ request.urgent_reason }}<br>
+                                <strong>Deadline:</strong> {{ request.needed_by.strftime('%d %B %Y, %I:%M %p') }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Hospital Info -->
+                    <h5 class="text-badhan mb-3"><i class="fas fa-hospital"></i> Hospital Information</h5>
+                    <div class="mb-4">
+                        <p><strong>Hospital:</strong> {{ request.hospital_name }}</p>
+                        <p><strong>Address:</strong> {{ request.hospital_address }}</p>
+                        <p><strong>Location:</strong> {{ request.location_upazila }}, {{ request.location_district }}, {{ request.location_division }}</p>
+                    </div>
+                    
+                    <!-- Contact Info -->
+                    <h5 class="text-badhan mb-3"><i class="fas fa-phone"></i> Contact for Donation</h5>
+                    <div class="mb-4">
+                        <p><strong>Contact Person:</strong> {{ request.contact_person }}</p>
+                        <p>
+                            <a href="tel:{{ request.contact_phone }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-phone"></i> Call: {{ request.contact_phone }}
+                            </a>
+                            {% if request.contact_email %}
+                            <a href="mailto:{{ request.contact_email }}" class="btn btn-primary btn-sm ms-2">
+                                <i class="fas fa-envelope"></i> Email
+                            </a>
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    {% if request.additional_info %}
+                    <h5 class="text-badhan mb-3"><i class="fas fa-info-circle"></i> Additional Information</h5>
+                    <div class="alert alert-light mb-4">
+                        {{ request.additional_info }}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2">
+                        {% if current_user.is_authenticated and current_user.can_donate_blood() and not request.is_fulfilled %}
+                        <form method="POST" action="{{ url_for('fulfill_blood_request', request_id=request.id) }}">
+                            <button type="submit" class="btn btn-success btn-lg w-100" onclick="return confirm('Are you sure you can donate blood for this request?')">
+                                <i class="fas fa-hand-holding-medical"></i> I Can Donate Blood
+                            </button>
+                        </form>
+                        {% elif request.is_fulfilled %}
+                        <div class="alert alert-success text-center">
+                            <i class="fas fa-check-circle"></i> This request has been fulfilled. Thank you to the donor!
+                        </div>
+                        {% elif not current_user.is_authenticated %}
+                        <a href="{{ url_for('login') }}?next={{ request.url }}" class="btn btn-badhan btn-lg w-100">
+                            <i class="fas fa-sign-in-alt"></i> Login to Donate
+                        </a>
+                        {% elif not current_user.can_donate_blood() %}
+                        <div class="alert alert-warning">
+                            {% if not current_user.is_verified %}
+                            <i class="fas fa-clock"></i> Your donor account is pending verification. Admin will review within 24 hours.
+                            {% elif current_user.age and current_user.age < 18 %}
+                            <i class="fas fa-info-circle"></i> You must be 18+ years old to donate blood.
+                            {% else %}
+                            <i class="fas fa-pause"></i> You are currently marked as unavailable to donate.
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('blood_requests') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Requests
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-footer text-muted small">
+                    Request posted on {{ request.created_at.strftime('%d %B %Y at %I:%M %p') }}
+                    {% if request.is_fulfilled %}
+                    • Fulfilled on {{ request.fulfilled_at.strftime('%d %B %Y') }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar: Related Info -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-badhan text-white">
+                    <i class="fas fa-info-circle"></i> Donation Guidelines
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled small mb-0">
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> Must be 18-60 years old</li>
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> Weight: 50kg+ (male), 45kg+ (female)</li>
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> Hemoglobin: 12.5g/dL+</li>
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> No illness in last 2 weeks</li>
+                        <li><i class="fas fa-check text-success"></i> Rest & hydrate after donation</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card shadow">
+                <div class="card-header bg-badhan text-white">
+                    <i class="fas fa-shield-alt"></i> Safety Notice
+                </div>
+                <div class="card-body small">
+                    <p class="mb-2">All donors are verified by our admin team. For urgent requests, please confirm details directly with the contact person before donating.</p>
+                    <p class="mb-0 text-danger"><strong>Emergency?</strong> Call <strong>999</strong> for immediate medical help.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

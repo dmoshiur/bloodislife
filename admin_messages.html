@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Anti-D Injection - LifeFlow{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="hero-section text-center mb-5" style="padding: 60px 0; border-radius: 30px;">
+        <h1 class="display-4 fw-bold"><i class="fas fa-syringe"></i> Anti-D Immunoglobulin</h1>
+        <p class="lead">Essential Information for Rh-Negative Mothers</p>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-lg-6">
+            <div class="card shadow-lg h-100">
+                <div class="card-body p-4">
+                    <h3 class="text-danger mb-4"><i class="fas fa-info-circle"></i> What is Anti-D?</h3>
+                    <p class="fs-5">Anti-D immunoglobulin is a life-saving injection given to Rh-negative pregnant women to prevent Rh incompatibility complications.</p>
+                    
+                    <div class="alert alert-warning mt-4">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Who Needs It?</h5>
+                        <ul class="mb-0">
+                            <li>Rh-negative mothers (blood group A-, B-, AB-, O-)</li>
+                            <li>Carrying or delivered an Rh-positive baby</li>
+                            <li>After miscarriage or abortion</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card shadow-lg h-100">
+                <div class="card-body p-4 text-center">
+                    <h3 class="text-danger mb-4"><i class="fas fa-image"></i> Anti-D Injection</h3>
+                    <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&h=400&fit=crop" alt="Anti-D Injection" class="img-fluid rounded shadow mb-3" style="max-height: 300px; object-fit: cover;">
+                    <p class="text-muted">Anti-D Immunoglobulin Vial</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for info in antid_info %}
+    <div class="card shadow-lg mb-5">
+        <div class="card-header bg-danger text-white py-3">
+            <h3 class="mb-0"><i class="fas fa-clock"></i> Timing & Dosage</h3>
+        </div>
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card bg-light h-100">
+                        <div class="card-body">
+                            <h5 class="text-danger"><i class="fas fa-calendar-check"></i> When to Take</h5>
+                            <ul class="list-unstyled mt-3">
+                                <li class="mb-3"><i class="fas fa-check-circle text-success"></i> <strong>During Pregnancy:</strong> 28 weeks gestation</li>
+                                <li class="mb-3"><i class="fas fa-check-circle text-success"></i> <strong>After Delivery:</strong> Within 72 hours if baby is Rh-positive</li>
+                                <li class="mb-3"><i class="fas fa-check-circle text-success"></i> <strong>After Miscarriage:</strong> Within 72 hours</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card bg-light h-100">
+                        <div class="card-body">
+                            <h5 class="text-danger"><i class="fas fa-pills"></i> Dosage Information</h5>
+                            <div class="alert alert-info mt-3">
+                                <h6>Standard Dose:</h6>
+                                <p class="mb-0 fs-5"><strong>300 mcg (1500 IU)</strong></p>
+                                <small>Given as intramuscular injection</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

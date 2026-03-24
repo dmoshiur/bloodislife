@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile - LifeFlow{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white py-3">
+                    <h3 class="mb-0"><i class="fas fa-edit"></i> Edit Profile</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="text-center mb-4">
+                            {% if current_user.image_file == 'default.jpg' %}
+                                <img src="https://ui-avatars.com/api/?background=random&name={{ current_user.name }}&size=150" class="rounded-circle mb-3" style="width: 150px; height: 150px;">
+                            {% else %}
+                                <img src="{{ url_for('uploaded_file', filename=current_user.image_file) }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                            {% endif %}
+                            <div>
+                                <label class="form-label fw-bold">Change Profile Picture</label>
+                                <input type="file" name="profile_pic" class="form-control" accept="image/*">
+                            </div>
+                        </div>
+
+                        <h5 class="text-danger mb-3"><i class="fas fa-user"></i> Personal Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Name</label>
+                                <input type="text" name="name" value="{{ current_user.name }}" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                <input type="text" name="phone" value="{{ current_user.phone }}" class="form-control" required>
+                            </div>
+                            
+                            <!-- NEW: Date of Birth & Age -->
+                            <div class="col-md-6">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" name="date_of_birth" id="date_of_birth" class="form-control" 
+                                       value="{{ current_user.date_of_birth.strftime('%Y-%m-%d') if current_user.date_of_birth else '' }}" 
+                                       onchange="calculateAge()">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Age</label>
+                                <input type="number" name="age" id="age" class="form-control" 
+                                       value="{{ current_user.age or '' }}" min="16" max="100">
+                                <small class="text-muted">Auto-calculated from DOB (editable)</small>
+                            </div>
+                            
+                            <!-- NEW: Birth Certificate -->
+                            <div class="col-md-12">
+                                <label class="form-label">Birth Certificate Number</label>
+                                <input type="text" name="birth_certificate" class="form-control" 
+                                       value="{{ current_user.birth_certificate_number or '' }}" 
+                                       placeholder="Enter birth certificate number">
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <label class="form-label">Address Holding/House</label>
+                                <input type="text" name="holding" value="{{ current_user.address_holding or '' }}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="mt-4 d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Update Profile</button>
+                            <a href="{{ url_for('my_profile') }}" class="btn btn-outline-secondary"><i class="fas fa-times"></i> Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function calculateAge() {
+    const dobInput = document.getElementById('date_of_birth');
+    const ageInput = document.getElementById('age');
+    
+    if (dobInput.value) {
+        const dob = new Date(dobInput.value);
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const monthDiff = today.getMonth() - dob.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+            age--;
+        }
+        
+        ageInput.value = age;
+    }
+}
+</script>
+{% endblock %}

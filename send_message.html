@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Blood Compatibility - LifeFlow{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Blood Compatibility</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">Donation Chart</div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <tr><th>Type</th><th>Give To</th><th>Receive From</th></tr>
+                        <tr><td>A+</td><td>A+, AB+</td><td>A+, A-, O+, O-</td></tr>
+                        <tr><td>O+</td><td>O+, A+, B+, AB+</td><td>O+, O-</td></tr>
+                        <tr><td>B+</td><td>B+, AB+</td><td>B+, B-, O+, O-</td></tr>
+                        <tr><td>AB+</td><td>AB+</td><td>Everyone</td></tr>
+                        <tr><td>A-</td><td>A+, A-, AB+, AB-</td><td>A-, O-</td></tr>
+                        <tr><td>O-</td><td>Everyone</td><td>O-</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

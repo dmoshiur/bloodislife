@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{{ user.name }} - Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="bg-dark text-white p-4 d-flex align-items-center flex-wrap">
+            {% if user.image_file == 'default.jpg' %}
+                <img src="https://ui-avatars.com/api/?background=random&name={{ user.name }}&size=150" class="profile-pic-lg bg-white">
+            {% else %}
+                <img src="{{ url_for('uploaded_file', filename=user.image_file) }}" class="profile-pic-lg bg-white">
+            {% endif %}
+            <div class="ms-4 flex-grow-1">
+                <h2 class="mb-1">{{ user.name }}</h2>
+                <p class="mb-1">{{ user.division }}</p>
+                <span class="badge {% if user.can_donate %}bg-success{% else %}bg-secondary{% endif %}">
+                    {% if user.can_donate %}✓ Available to Donate{% else %}✗ Unavailable{% endif %}
+                </span>
+            </div>
+            <div class="text-center mt-3 mt-md-0">
+                <div class="display-6 fw-bold text-danger bg-white rounded p-3">{{ user.blood_group }}</div>
+            </div>
+        </div>
+        
+        <div class="card-body p-4">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h5 class="text-danger mb-3"><i class="fas fa-user"></i> Personal Information</h5>
+                    <table class="table table-bordered">
+                        <tr><th width="40%">Name</th><td>{{ user.name }}</td></tr>
+                        <tr><th>Age</th><td>{{ user.age or 'N/A' }} years</td></tr>
+                        {% if user.date_of_birth %}
+                        <tr><th>Date of Birth</th><td>{{ user.date_of_birth.strftime('%d %B %Y') }}</td></tr>
+                        {% endif %}
+                        {% if user.birth_certificate_number %}
+                        <tr><th>Birth Certificate</th><td>{{ user.birth_certificate_number }}</td></tr>
+                        {% endif %}
+                        <tr><th>Phone</th><td>{{ user.phone }}</td></tr>
+                        <tr><th>Email</th><td>{{ user.email }}</td></tr>
+                        <tr><th>Blood Group</th><td><span class="blood-badge">{{ user.blood_group }}</span></td></tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="text-danger mb-3"><i class="fas fa-map-marker-alt"></i> Address Details</h5>
+                    <table class="table table-bordered">
+                        <tr><th width="40%">Division</th><td>{{ user.division or 'N/A' }}</td></tr>
+                        <tr><th>District</th><td>{{ user.district or 'N/A' }}</td></tr>
+                        <tr><th>Upazila</th><td>{{ user.upazila or 'N/A' }}</td></tr>
+                        <tr><th>Union/Area</th><td>{{ user.union or 'N/A' }}</td></tr>
+                        <tr><th>Holding/House</th><td>{{ user.address_holding or 'N/A' }}</td></tr>
+                    </table>
+                    
+                    {% if current_user.is_authenticated %}
+                    <h5 class="text-danger mb-3 mt-4"><i class="fas fa-comments"></i> Contact</h5>
+                    <div class="d-grid gap-2">
+                        <a href="tel:{{ user.phone }}" class="btn btn-success"><i class="fas fa-phone"></i> Call Now</a>
+                        <a href="mailto:{{ user.email }}" class="btn btn-primary"><i class="fas fa-envelope"></i> Send Email</a>
+                        <a href="{{ url_for('send_message') }}" class="btn btn-outline-danger"><i class="fas fa-comment"></i> Send Message</a>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning mt-4">
+                        <i class="fas fa-lock"></i> Please <a href="{{ url_for('login') }}">Login</a> to see contact details.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

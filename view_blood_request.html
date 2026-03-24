@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Blood Requests - LifeFlow{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item active">Blood Requests</li>
+        </ol>
+    </nav>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0"><i class="fas fa-tint text-badhan"></i> Blood Requests</h3>
+        <a href="{{ url_for('request_blood') }}" class="btn btn-badhan">
+            <i class="fas fa-plus"></i> New Request
+        </a>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-2 align-items-end">
+                <div class="col-6 col-md-2">
+                    <label class="form-label small">Blood Group</label>
+                    <select name="bg" class="form-select form-select-sm">
+                        <option value="">All</option>
+                        <option value="A+">A+</option><option value="A-">A-</option>
+                        <option value="B+">B+</option><option value="B-">B-</option>
+                        <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                        <option value="O+">O+</option><option value="O-">O-</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label small">District</label>
+                    <input type="text" name="dist" class="form-control form-control-sm" placeholder="Search district">
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small">
+                        <input type="checkbox" name="urgent" value="true" {% if request.args.get('urgent') == 'true' %}checked{% endif %}>
+                        Urgent Only
+                    </label>
+                </div>
+                <div class="col-6 col-md-3">
+                    <button type="submit" class="btn btn-badhan btn-sm w-100">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+                <div class="col-12 col-md-2">
+                    <a href="{{ url_for('blood_requests') }}" class="btn btn-outline-secondary btn-sm w-100">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Requests List -->
+    <div class="row g-3">
+        {% for req in requests %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 {% if req.is_urgent %}border-danger{% endif %}">
+                {% if req.is_urgent %}
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-tint"></i> {{ req.blood_group }}</span>
+                    <span class="badge-urgent">URGENT</span>
+                </div>
+                {% else %}
+                <div class="card-header bg-badhan text-white">
+                    <i class="fas fa-tint"></i> {{ req.blood_group }} Needed
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h6 class="fw-bold mb-2">{{ req.patient_name }} {% if req.patient_relation != 'Self' %}({{ req.patient_relation }}){% endif %}</h6>
+                    <p class="small mb-2">
+                        <i class="fas fa-hospital"></i> {{ req.hospital_name }}<br>
+                        <i class="fas fa-map-marker-alt"></i> {{ req.location_district }}, {{ req.location_upazila }}
+                    </p>
+                    <p class="small mb-3">
+                        <strong>Contact:</strong> {{ req.contact_person }} - {{ req.contact_phone }}<br>
+                        <strong>Needed by:</strong> {{ req.needed_by.strftime('%d %b, %I:%M %p') }}
+                    </p>
+                    {% if req.is_urgent and req.urgent_reason %}
+                    <p class="small text-danger mb-3">
+                        <i class="fas fa-exclamation-circle"></i> {{ req.urgent_reason }}
+                    </p>
+                    {% endif %}
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('view_blood_request', request_id=req.id) }}" class="btn btn-sm {% if req.is_urgent %}btn-danger{% else %}btn-outline-badhan{% endif %}">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                        {% if current_user.is_authenticated and current_user.can_donate_blood() %}
+                        <form method="POST" action="{{ url_for('fulfill_blood_request', request_id=req.id) }}">
+                            <button type="submit" class="btn btn-sm btn-success w-100" onclick="return confirm('Mark this request as fulfilled?')">
+                                <i class="fas fa-check"></i> I Can Donate
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer small text-muted">
+                    Posted: {{ req.created_at.strftime('%d %b %Y') }}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-5">
+            <i class="fas fa-tint fa-3x text-muted mb-3"></i>
+            <h5>No active blood requests found.</h5>
+            <p class="text-muted">Be the first to request blood or check back later.</p>
+            <a href="{{ url_for('request_blood') }}" class="btn btn-badhan">
+                <i class="fas fa-plus"></i> Request Blood Now
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

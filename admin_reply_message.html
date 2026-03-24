@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Reply Message - LifeFlow{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white py-3">
+                    <h4 class="mb-0"><i class="fas fa-reply"></i> Reply to Message</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4 p-3 bg-light rounded border-start border-4 border-primary">
+                        <h6 class="text-muted mb-2">Original Message:</h6>
+                        <h5 class="mb-2">{{ original.subject }}</h5>
+                        <p class="mb-1"><strong>From:</strong> {{ original.sender.name }}</p>
+                        <p class="mb-3">{{ original.content }}</p>
+                    </div>
+
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Your Reply:</label>
+                            <textarea name="content" class="form-control" rows="6" required placeholder="Type your reply here..."></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg"><i class="fas fa-paper-plane"></i> Send Reply</button>
+                            <a href="{{ url_for('messages') }}" class="btn btn-outline-secondary"><i class="fas fa-times"></i> Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}My Profile - LifeFlow{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card text-center p-4 shadow-lg">
+                {% if current_user.image_file == 'default.jpg' %}
+                    <img src="https://ui-avatars.com/api/?background=random&name={{ current_user.name }}&size=200" class="mx-auto mb-3 rounded-circle" style="width: 150px; height: 150px;">
+                {% else %}
+                    <img src="{{ url_for('uploaded_file', filename=current_user.image_file) }}" class="mx-auto mb-3 rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                {% endif %}
+                <h4 class="fw-bold mb-1">{{ current_user.name }}</h4>
+                <p class="text-muted mb-2">{{ current_user.email }}</p>
+                <span class="blood-badge mb-3">{{ current_user.blood_group }}</span>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('edit_profile') }}" class="btn btn-primary"><i class="fas fa-edit"></i> Edit Profile</a>
+                    <a href="{{ url_for('messages') }}" class="btn btn-outline-secondary"><i class="fas fa-envelope"></i> Messages</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow-lg p-4">
+                <h4 class="text-danger mb-3"><i class="fas fa-id-card"></i> My Information</h4>
+                
+                <div class="alert {% if current_user.can_donate %}alert-success{% else %}alert-warning{% endif %} d-flex justify-content-between align-items-center mb-4">
+                    <span>
+                        <strong>Donation Status:</strong> 
+                        {% if current_user.can_donate %}✓ Ready to Donate{% else %}✗ Not Available{% endif %}
+                    </span>
+                    <form method="POST" action="{{ url_for('toggle_status') }}" class="mb-0">
+                        <button class="btn btn-sm btn-dark"><i class="fas fa-sync"></i> Change Status</button>
+                    </form>
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <table class="table table-bordered">
+                            <tr><th>Name</th><td>{{ current_user.name }}</td></tr>
+                            <tr><th>Email</th><td>{{ current_user.email }}</td></tr>
+                            <tr><th>Phone</th><td>{{ current_user.phone }}</td></tr>
+                            <tr><th>Age</th><td>{{ current_user.age or 'N/A' }} years</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-bordered">
+                            {% if current_user.date_of_birth %}
+                            <tr><th>Date of Birth</th><td>{{ current_user.date_of_birth.strftime('%d %B %Y') }}</td></tr>
+                            {% endif %}
+                            {% if current_user.birth_certificate_number %}
+                            <tr><th>Birth Certificate</th><td>{{ current_user.birth_certificate_number }}</td></tr>
+                            {% endif %}
+                            <tr><th>Blood Group</th><td><span class="blood-badge">{{ current_user.blood_group }}</span></td></tr>
+                            <tr><th>Role</th><td>{{ current_user.role }}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-12">
+                        <table class="table table-bordered">
+                            <tr><th width="20%">Address</th><td>{{ current_user.district }}, {{ current_user.upazila }}, {{ current_user.division }}</td></tr>
+                            <tr><th>Holding/House</th><td>{{ current_user.address_holding or 'N/A' }}</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

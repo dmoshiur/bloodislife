@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Read Message - LifeFlow{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="fas fa-envelope-open-text"></i> Message</h4>
+                        <a href="{{ url_for('messages') }}" class="btn btn-sm btn-light"><i class="fas fa-arrow-left"></i> Back</a>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                        <div class="me-3">
+                            {% if message.sender.image_file == 'default.jpg' %}
+                                <img src="https://ui-avatars.com/api/?background=random&name={{ message.sender.name }}&size=60" class="rounded-circle" style="width: 60px; height: 60px;">
+                            {% else %}
+                                <img src="{{ url_for('uploaded_file', filename=message.sender.image_file) }}" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="mb-1">{{ message.subject }}</h5>
+                            <p class="mb-0 text-muted">From: <strong>{{ message.sender.name }}</strong></p>
+                            <small class="text-muted"><i class="fas fa-clock"></i> {{ message.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 p-4 bg-light rounded">
+                        <p class="mb-0 fs-5">{{ message.content }}</p>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5><i class="fas fa-reply"></i> Reply to this message</h5>
+                        <form method="POST" action="{{ url_for('reply_message', message_id=message.id) }}">
+                            <div class="mb-3">
+                                <textarea name="content" class="form-control" rows="4" required placeholder="Type your reply..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send Reply</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
